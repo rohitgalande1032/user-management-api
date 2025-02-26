@@ -14,11 +14,21 @@ app.use(express.json())
 
 mongoose.connect(url)
 .then(()=> console.log("Connected to database"))
+.catch((err) => console.log(err))
+
+//Middleware is a function that is called before the request is processed
+//logging middleware ->> What route is called at what time
+//next --> next gives the signal to express that middleware has been executed 
+
+const loggingMiddleware = (req, res, next) => {
+    console.log(`[${new Date().toLocaleString()}, Method: ${req.method}, URL: localhost:3000${req.url}]`)
+    next()
+}
 
 //routes for user management from the database
 app.use("/api/users", userRoutes)
 
-app.get("/", (req, res) => {
+app.get("/", loggingMiddleware, (req, res) => {
     res.send("Hello World!!")
 })
 

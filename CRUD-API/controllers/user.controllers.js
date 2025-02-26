@@ -1,10 +1,27 @@
 const User = require("../model/user.model")
+const { generateToken } = require("../middleware/auth")
 
 const postRoute = async (req, res) => {
     try {
+        //1st -> it creates a user
         const user = await User.create(req.body)
         console.log(user)
-        res.status(201).json(user)
+
+        //2nd -> it generates a token
+        //2-A --> payload is defined
+        // in user schema we have --> username, email and role
+        const payload = {
+            username: user.username,
+            email: user.email,
+        }
+        const token = await generateToken(payload)
+        console.log("Token: ", token)
+
+        res.status(201).json({
+            message: "User created successfully",
+            user: user,
+            token: token
+        })
     } catch (error) {
         res.status(500).json({
             message: error
