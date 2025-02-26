@@ -5,14 +5,13 @@ const postRoute = async (req, res) => {
     try {
         //1st -> it creates a user
         const user = await User.create(req.body)
-        console.log(user)
+        //console.log(user)
 
         //2nd -> it generates a token
         //2-A --> payload is defined
         // in user schema we have --> username, email and role
         const payload = {
             username: user.username,
-            email: user.email,
         }
         const token = await generateToken(payload)
         console.log("Token: ", token)
@@ -60,6 +59,7 @@ const putId = async (req, res) => {
             return res.status(404).json({message: "User not found"})
         }
 
+
         //this is to confirm if the changes have been implemented or not
         const updatedUser = await User.findById(req.params.id);
         res.status(200).json(updatedUser)
@@ -76,7 +76,7 @@ const deleteId = async (req, res) => {
         const user = await User.findByIdAndDelete(id)
         
         if(!user) {
-            return res.status(404).json({message: "User not found"})
+            return res.status(404).json({message: "Username or password is incorrect"})
         }
         res.status(200).json(user)
         res.status(200).json({"message" : "User deleted successfully!!"})

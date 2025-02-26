@@ -5,6 +5,7 @@ const { getRoute, postRoute, getId, putId, deleteId } =  require('../controllers
 const User = require('../model/user.model');
 const { jwtAuth, generateToken } = require('../middleware/auth');
 
+
 //signup page
 //post users route
 router.post("/signup", postRoute) 
@@ -12,20 +13,29 @@ router.post("/signup", postRoute)
 //login route
 router.post("/login", async (req, res)=> {
     try {
-        const {username} = req.body;
+        const {username, password} = req.body;
         const user = await User.findOne({username: username})
+
         if(!user) {
-            return res.status(400).json({message: "Invalid username or email"})
+            return res.status(400).json({message: "User dosent exist"})
         }
+
+        //chaeck the password from bcrypt
+        const isPasswordValid = await user.comparePassword(password);
+
+        if(!isPasswordValid) {
+            return res.status(401).json({message: "Invalid password"});
+        }
+        
         const payload = {
             username: user.username,
-            email: user.email
         }
 
         const token = await generateToken(payload)
         res.status(200).json({user: user, token: token})
+        // res.status(200).json("Successfully logged In...")
     } catch (error) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({message: error.message})
     }
 })
 
